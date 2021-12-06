@@ -38,8 +38,6 @@ const CourseInfo = (props) => {
       data.prerequisite = data.sections[0].prerequisites;
     }
 
-    // console.log(data);
-
     response = await axios(`/comments/${schoolId}/${subjectId}/${courseId}`);
     console.log(response);
     if (response.data.length !== 0) {
@@ -64,7 +62,7 @@ const CourseInfo = (props) => {
   };
 
   const getDay = (date) => {
-    let day = new Date(date);
+    let day = new Date(date).toUTCString();
     day = day.toString().substring(0, 4);
     return day;
   };
@@ -131,7 +129,8 @@ const CourseInfo = (props) => {
     if (description.length > 70 && showMore) {
       return (
         <p>
-          <a href='/#' onClick={() => setShowMore(false)}>
+          {/* eslint-disable-next-line */}
+          <a onClick={() => setShowMore(false)}>
             Description: {description} <i>Show less</i>
           </a>
         </p>
@@ -140,7 +139,8 @@ const CourseInfo = (props) => {
     if (description.length > 70) {
       return (
         <p>
-          <a href='/#' onClick={() => setShowMore(true)}>
+          {/* eslint-disable-next-line */}
+          <a onClick={() => setShowMore(true)}>
             Description: {description.slice(0, 70)} <i>...show more</i>
           </a>
         </p>
@@ -212,21 +212,31 @@ const CourseInfo = (props) => {
               <Col xs='12'>Location: {section.location}</Col>
               <Col xs='12'>Instruction Mode: {section.instructionMode}</Col>
               <Col xs='12'>Units: {section.maxUnits}</Col>
-              <Col xs='12'>
-                Dates: {section.meetings[0].beginDate.substring(0, 10)} -{" "}
-                {section.meetings[0].endDate.substring(0, 10)}
-              </Col>
-              <Col xs='12'>
-                Meets: {getDay(section.meetings[0].beginDate.substring(0, 10))}{" "}
-                {section.meetings.length > 1
-                  ? getDay(section.meetings[1].beginDate.substring(0, 10))
-                  : ""}{" "}
-                {section.meetings[0].beginDate.substring(11, 16)} -{" "}
-                {getEndTime(
-                  section.meetings[0].beginDate.substring(11, 16),
-                  section.meetings[0].minutesDuration
-                )}
-              </Col>
+              {section.meetings === null ? (
+                <></>
+              ) : (
+                <Col xs='12'>
+                  Dates: {section.meetings[0].beginDate.substring(0, 10)} -{" "}
+                  {section.meetings[0].endDate.substring(0, 10)}
+                </Col>
+              )}
+              {section.meetings === null ? (
+                <></>
+              ) : (
+                <Col xs='12'>
+                  Meets:{" "}
+                  {getDay(section.meetings[0].beginDate.substring(0, 10))}{" "}
+                  {section.meetings.length > 1
+                    ? getDay(section.meetings[1].beginDate.substring(0, 10))
+                    : ""}{" "}
+                  {section.meetings[0].beginDate.substring(11, 16)} -{" "}
+                  {getEndTime(
+                    section.meetings[0].beginDate.substring(11, 16),
+                    section.meetings[0].minutesDuration
+                  )}
+                </Col>
+              )}
+
               <Col xs='12'>
                 Status:{" "}
                 {section.status === "WaitList"
